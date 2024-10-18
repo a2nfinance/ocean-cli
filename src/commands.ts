@@ -28,6 +28,8 @@ import {
 import {CustomProviderInstance} from "./CustomProvider";
 
 import { Signer, ethers } from "ethers";
+import { interactiveFlow } from "./interactiveFlow";
+import { publishAsset } from "./publishAsset";
 import { CustomComputeAlgorithm } from "./extendtypes";
 
 export class Commands {
@@ -40,9 +42,9 @@ export class Commands {
 	constructor(signer: Signer, network: string | number, config?: Config) {
 		this.signer = signer;
 		this.config = config || new ConfigHelper().getConfig(network);
-		this.providerUrl = process.env.PROVIDER_URL || this.config.providerUri;
+		this.providerUrl = process.env.NODE_URL || process.env.PROVIDER_URL || this.config.providerUri;
 		if (
-			!process.env.PROVIDER_URL &&
+			!process.env.PROVIDER_URL && !process.env.NODE_URL &&
 			this.config.chainId === 8996 &&
 			os.type() === "Darwin"
 		) {
@@ -52,20 +54,27 @@ export class Commands {
 		this.macOsProviderUrl &&
 			console.log(" -> MacOS provider url :", this.macOsProviderUrl);
 		if (
-			!process.env.AQUARIUS_URL &&
+			!process.env.AQUARIUS_URL && !process.env.NODE_URL &&
 			this.config.chainId === 8996 &&
 			os.type() === "Darwin"
 		) {
 			this.config.metadataCacheUri = "http://127.0.0.1:5000";
 		}
 		this.aquarius = new Aquarius(
-			process.env.AQUARIUS_URL || this.config.metadataCacheUri
+			process.env.NODE_URL || process.env.AQUARIUS_URL || this.config.metadataCacheUri
 		);
 		console.log(
 			"Using Aquarius :",
-			process.env.AQUARIUS_URL || this.config.metadataCacheUri
+			process.env.NODE_URL || process.env.AQUARIUS_URL || this.config.metadataCacheUri
 		);
 	}
+
+	public async start() {
+		console.log('Starting the interactive CLI flow...\n\n');
+		const data = await interactiveFlow(this.providerUrl); // Collect data via CLI
+		await publishAsset(data, this.signer, this.config); // Publish asset with collected data
+	  }
+
 	// utils
 	public async sleep(ms: number) {
 		return new Promise((resolve) => {
@@ -96,6 +105,7 @@ export class Commands {
 				this.providerUrl,
 				this.config,
 				this.aquarius,
+				1,
 				this.macOsProviderUrl,
 				encryptDDO
 			);
@@ -127,6 +137,7 @@ export class Commands {
 			this.providerUrl,
 			this.config,
 			this.aquarius,
+			1,
 			this.macOsProviderUrl,
 			encryptDDO
 		);
