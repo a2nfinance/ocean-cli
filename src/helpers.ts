@@ -255,7 +255,9 @@ export async function handleComputeOrder(
        - have validOrder and providerFees -> then order is valid but providerFees are not valid, we need to call reuseOrder and pay only providerFees
        - no validOrder -> we need to call startOrder, to pay 1 DT & providerFees
     */
-	if (order.providerFee && order.providerFee.providerFeeAmount) {
+	if (order.providerFee && parseInt(order.providerFee.providerFeeAmount)) {
+		console.log(order.providerFee, order.providerFee.providerFeeAmount)
+		console.log("Approve Wei");
 		await approveWei(
 			payerAccount,
 			config,

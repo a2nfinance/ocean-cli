@@ -24,7 +24,11 @@ import {
 	orderAsset,
 	sendTx,
 } from "@oceanprotocol/lib";
+
+import {CustomProviderInstance} from "./CustomProvider";
+
 import { Signer, ethers } from "ethers";
+import { CustomComputeAlgorithm } from "./extendtypes";
 
 export class Commands {
 	public signer: Signer;
@@ -301,7 +305,8 @@ export class Commands {
 			}
 		}
 		
-		const algo: ComputeAlgorithm = {
+		const algo: CustomComputeAlgorithm = {
+			fileObject: algoDdo.services[0].fileObject,
 			documentId: algoDdo.id,
 			serviceId: algoDdo.services[0].id,
 			meta: algoDdo.metadata.algorithm
@@ -322,11 +327,11 @@ export class Commands {
 				return;
 			}
 			assets.push({
+				fileObject: ddos[dataDdo].services[0].fileObject,
 				documentId: ddos[dataDdo].id,
 				serviceId: ddos[dataDdo].services[0].id,
 			});
 		}
-
 		console.log("Starting compute job using provider: ", providerURI);
 		const providerInitializeComputeJob =
 			await ProviderInstance.initializeCompute(
@@ -405,7 +410,7 @@ export class Commands {
 			metadataUri: await getMetadataURI()
 		}
 
-		const computeJobs = await ProviderInstance.computeStart(
+		const computeJobs = await CustomProviderInstance.computeStart(
 			providerURI,
 			this.signer,
 			computeEnv.id,
@@ -415,10 +420,12 @@ export class Commands {
 			additionalDatasets,
 			output
 		);
+		console.log("Output:", output);
 		if (computeJobs && computeJobs[0]) {
 			const { jobId, agreementId } = computeJobs[0];
 			console.log("Compute started.  JobID: " + jobId);
 			console.log("Agreement ID: " + agreementId);
+			console.log("Computed Jobs:", computeJobs[0]);
 		} else {
 			console.log("Error while starting the compute job: ", computeJobs);
 		}

@@ -69,7 +69,7 @@ async function start() {
 	console.log("Using account: " + (await signer.getAddress()));
 
 	const { chainId } = await signer.provider.getNetwork();
-	const commands = new Commands(signer, chainId);
+	const commands = new Commands(signer, parseInt(chainId));
 	const myArgs = process.argv.slice(2);
 	switch (myArgs[0]) {
 		case "getDDO":
@@ -101,7 +101,6 @@ async function start() {
 			break;
 		case "getJobStatus":
 			await commands.getJobStatus(myArgs);
-			break;
 			break;
 		case "downloadJobResults":
 			await commands.downloadJobResults(myArgs);
