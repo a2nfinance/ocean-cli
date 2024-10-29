@@ -1,25 +1,25 @@
 import {
-    ComputeAlgorithm,
-    ComputeAsset,
-    ComputeJob,
-    ComputeOutput,
-    LoggerInstance,
-    Provider
+  ComputeAlgorithm,
+  ComputeAsset,
+  ComputeJob,
+  ComputeOutput,
+  LoggerInstance,
+  Provider
 } from "@oceanprotocol/lib";
 
 import { Signer } from 'ethers';
 class CustomProvider extends Provider {
-    /** Instruct the provider to start a compute job
-   * @param {string} providerUri The provider URI.
-   * @param {Signer} signer The consumer signer object.
-   * @param {string} computeEnv The compute environment.
-   * @param {ComputeAsset} dataset The dataset to start compute on
-   * @param {ComputeAlgorithm} algorithm The algorithm to start compute with.
-   * @param {AbortSignal} signal abort signal
-   * @param {ComputeAsset[]} additionalDatasets The additional datasets if that is the case.
-   * @param {ComputeOutput} output The compute job output settings.
-   * @return {Promise<ComputeJob | ComputeJob[]>} The compute job or jobs.
-   */
+  /** Instruct the provider to start a compute job
+ * @param {string} providerUri The provider URI.
+ * @param {Signer} signer The consumer signer object.
+ * @param {string} computeEnv The compute environment.
+ * @param {ComputeAsset} dataset The dataset to start compute on
+ * @param {ComputeAlgorithm} algorithm The algorithm to start compute with.
+ * @param {AbortSignal} signal abort signal
+ * @param {ComputeAsset[]} additionalDatasets The additional datasets if that is the case.
+ * @param {ComputeOutput} output The compute job output settings.
+ * @return {Promise<ComputeJob | ComputeJob[]>} The compute job or jobs.
+ */
   public async computeStart(
     providerUri: string,
     consumer: Signer,
@@ -39,10 +39,16 @@ class CustomProvider extends Provider {
     // If the compute engine is free then using 'startFreeCompute' to avoid this error:
     // Compute start failed:  500 Internal Server Error Free Jobs cannot be started here, use startFreeCompute
     // Default vallue is 'computeStart'
-    const computeStartUrl = super.getEndpointURL(serviceEndpoints, '/api/services/freeCompute')
+
+    let computeStartUrl = super.getEndpointURL(serviceEndpoints, '/api/services/freeCompute')
       ? super.getEndpointURL(serviceEndpoints, '/api/services/freeCompute').urlPath
       : null
 
+    if (computeEnv.indexOf("-free") === -1) {
+      computeStartUrl = super.getEndpointURL(serviceEndpoints, 'computeStart')
+        ? super.getEndpointURL(serviceEndpoints, 'computeStart').urlPath
+        : null
+    }
 
     const consumerAddress = await consumer.getAddress()
     const nonce = (

@@ -317,7 +317,7 @@ export class Commands {
 		}
 		
 		const algo: CustomComputeAlgorithm = {
-			fileObject: algoDdo.services[0].fileObject,
+			fileObject: algoDdo.services[0].files.files[0],
 			documentId: algoDdo.id,
 			serviceId: algoDdo.services[0].id,
 			meta: algoDdo.metadata.algorithm
@@ -338,7 +338,7 @@ export class Commands {
 				return;
 			}
 			assets.push({
-				fileObject: ddos[dataDdo].services[0].fileObject,
+				fileObject: ddos[dataDdo].services[0].files.files[0],
 				documentId: ddos[dataDdo].id,
 				serviceId: ddos[dataDdo].services[0].id,
 			});
